@@ -254,12 +254,12 @@ func (p *Pruner) Prune(root common.Hash) error {
 		// Retrieve all snapshot layers from the current HEAD.
 		// In theory there are 128 difflayers + 1 disk layer present,
 		// so 128 diff layers are expected to be returned.
-		layers = p.snaptree.Snapshots(p.chainHeader.Root, 128, true)
-		if len(layers) != 128 {
+		layers = p.snaptree.Snapshots(p.chainHeader.Root, 10000, true)
+		if len(layers) != 10000 {
 			// Reject if the accumulated diff layers are less than 128. It
 			// means in most of normal cases, there is no associated state
 			// with bottom-most diff layer.
-			return fmt.Errorf("snapshot not old enough yet: need %d more blocks", 128-len(layers))
+			return fmt.Errorf("snapshot not old enough yet: need %d more blocks", 10000-len(layers))
 		}
 		// Use the bottom-most diff layer as the target
 		root = layers[len(layers)-1].Root()
@@ -380,7 +380,7 @@ func RecoverPruning(datadir string, db ethdb.Database) error {
 	// otherwise the dangling state will be left.
 	var (
 		found       bool
-		layers      = snaptree.Snapshots(headBlock.Root(), 128, true)
+		layers      = snaptree.Snapshots(headBlock.Root(), 10000, true)
 		middleRoots = make(map[common.Hash]struct{})
 	)
 	for _, layer := range layers {
